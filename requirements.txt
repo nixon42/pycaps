@@ -1,0 +1,9 @@
+Pillow,
+numpy,
+pydantic,
+typer,
+requests,
+multiprocess,
+tqdm,
+movielite,
+platformdirs
