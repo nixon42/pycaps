@@ -1,5 +1,4 @@
 __pycache__
-!requirements.txt
 *.mp4
 .env
 .vscode
@@ -11,6 +10,7 @@ tools
 examples
 dumper.py
 *.txt
+!requirements.txt
 demo
 TODO.md
 research
