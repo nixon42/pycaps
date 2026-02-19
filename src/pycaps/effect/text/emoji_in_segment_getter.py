@@ -12,19 +12,25 @@ class EmojiInSegmentGetter:
         self._started = False
 
     def start(self, document: Document) -> None:
-        if ApiKeyService.has():
-            self._getter = EmojiInSegmentsApi()
-            self._getter.start(document)
-        elif LlmProvider.get().is_enabled():
-            logger().warning(
-                "Pycaps API is not set, using external LLM API key for AI auto emojis for segments effect."
+        try:
+            if ApiKeyService.has():
+                self._getter = EmojiInSegmentsApi()
+                self._getter.start(document)
+            elif LlmProvider.get().is_enabled():
+                logger().warning(
+                    "Pycaps API is not set, using external LLM API key for AI auto emojis for segments effect."
+                )
+                self._getter = EmojiInSegmentLlmGetter()
+                self._getter.start(document)
+            else:
+                logger().warning(
+                    "Neither Pycaps API nor external LLM API key are set. Ignoring AI auto emojis for segments effect."
+                )
+        except Exception as e:
+            logger().error(
+                f"Failed to initialize AI emoji getter: {e}. AI emojis will be disabled for this render."
             )
-            self._getter = EmojiInSegmentLlmGetter()
-            self._getter.start(document)
-        else:
-            logger().warning(
-                "Neither Pycaps API nor external LLM API key are set. Ignoring AI auto emojis for segments effect."
-            )
+            self._getter = None
 
         self._started = True
 
