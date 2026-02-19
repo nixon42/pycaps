@@ -5,6 +5,7 @@ from .external_llm_tagger import ExternalLlmTagger
 from pycaps.ai import LlmProvider
 from pycaps.logger import logger
 
+
 class AiTagger:
     def process(self, text: str, rules: Dict[Tag, str]) -> str:
         """
@@ -21,8 +22,18 @@ class AiTagger:
         if ApiKeyService.has():
             return PycapsTaggerApi().process(text, rules)
         elif LlmProvider.get().is_enabled():
-            logger().warning("Pycaps API is not set, using external LLM API key for AI tagging rules.")
-            return ExternalLlmTagger().process(text, rules)
+            logger().warning(
+                "Pycaps API is not set, using external LLM API key for AI tagging rules."
+            )
+            try:
+                return ExternalLlmTagger().process(text, rules)
+            except Exception as e:
+                logger().error(
+                    f"AI tagging failed: {e}. Falling back to original text."
+                )
+                return text
         else:
-            logger().warning("Neither Pycaps API nor external LLM API key are set. Ignoring AI tagging rules.")
+            logger().warning(
+                "Neither Pycaps API nor external LLM API key are set. Ignoring AI tagging rules."
+            )
             return text

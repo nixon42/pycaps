@@ -1,7 +1,11 @@
 import json
 from .caps_pipeline_builder import CapsPipelineBuilder
 from .caps_pipeline import CapsPipeline
-from pycaps.transcriber import LimitByWordsSplitter, LimitByCharsSplitter, SplitIntoSentencesSplitter
+from pycaps.transcriber import (
+    LimitByWordsSplitter,
+    LimitByCharsSplitter,
+    SplitIntoSentencesSplitter,
+)
 from pycaps.tag import TagConditionFactory, TagCondition
 from pycaps.effect import *
 from pycaps.animation import *
@@ -12,6 +16,7 @@ from pycaps.common import Tag
 from typing import overload, Literal
 import os
 
+
 class JsonConfigLoader:
     def __init__(self, json_path: str) -> None:
         with open(json_path, "r", encoding="utf-8") as f:
@@ -20,23 +25,27 @@ class JsonConfigLoader:
         self._base_path = os.path.dirname(self._json_path)
 
     @overload
-    def load(self, should_build_pipeline: Literal[True] = True) -> CapsPipeline:
-        ...
+    def load(self, should_build_pipeline: Literal[True] = True) -> CapsPipeline: ...
     @overload
-    def load(self, should_build_pipeline: Literal[False]) -> CapsPipelineBuilder:
-        ...
-    def load(self, should_build_pipeline: bool = True) -> CapsPipeline | CapsPipelineBuilder:
+    def load(self, should_build_pipeline: Literal[False]) -> CapsPipelineBuilder: ...
+    def load(
+        self, should_build_pipeline: bool = True
+    ) -> CapsPipeline | CapsPipelineBuilder:
         try:
             self._config = JsonSchema(**self._data)
             self._builder = CapsPipelineBuilder()
             if self._config.css:
                 self._builder.add_css(os.path.join(self._base_path, self._config.css))
             if self._config.input:
-                self._builder.with_input_video(os.path.join(self._base_path, self._config.input))
+                self._builder.with_input_video(
+                    os.path.join(self._base_path, self._config.input)
+                )
             if self._config.output:
                 self._builder.with_output_video(self._config.output)
             if self._config.resources:
-                self._builder.with_resources(os.path.join(self._base_path, self._config.resources))
+                self._builder.with_resources(
+                    os.path.join(self._base_path, self._config.resources)
+                )
             if self._config.cache_strategy:
                 self._builder.with_cache_strategy(self._config.cache_strategy)
 
@@ -67,8 +76,7 @@ class JsonConfigLoader:
             return
         whisper_data = self._config.whisper
         self._builder.with_whisper_config(
-            language=whisper_data.language,
-            model_size=whisper_data.model
+            language=whisper_data.language, model_size=whisper_data.model
         )
 
     def _load_layout_options(self) -> None:
@@ -80,11 +88,21 @@ class JsonConfigLoader:
         for splitter in self._config.splitters:
             match splitter.type:
                 case "limit_by_words":
-                    self._builder.add_segment_splitter(LimitByWordsSplitter(splitter.limit))
+                    self._builder.add_segment_splitter(
+                        LimitByWordsSplitter(splitter.limit)
+                    )
                 case "limit_by_chars":
-                    self._builder.add_segment_splitter(LimitByCharsSplitter(splitter.max_chars, splitter.min_chars, splitter.avoid_finishing_segment_with_word_shorter_than))
+                    self._builder.add_segment_splitter(
+                        LimitByCharsSplitter(
+                            splitter.max_chars,
+                            splitter.min_chars,
+                            splitter.avoid_finishing_segment_with_word_shorter_than,
+                        )
+                    )
                 case "split_into_sentences":
-                    self._builder.add_segment_splitter(SplitIntoSentencesSplitter(splitter.sentences_separators))
+                    self._builder.add_segment_splitter(
+                        SplitIntoSentencesSplitter(splitter.sentences_separators)
+                    )
                 case _:
                     raise ValueError(f"Invalid segment splitter type: {splitter.type}")
 
@@ -92,13 +110,35 @@ class JsonConfigLoader:
         for effect in self._config.effects:
             match effect.type:
                 case "emoji_in_segment":
-                    self._builder.add_effect(EmojiInSegmentEffect(effect.chance_to_apply, effect.align, effect.ignore_segments_with_duration_less_than, effect.max_uses_of_each_emoji, effect.max_consecutive_segments_with_emoji))
+                    self._builder.add_effect(
+                        EmojiInSegmentEffect(
+                            effect.chance_to_apply,
+                            effect.align,
+                            effect.ignore_segments_with_duration_less_than,
+                            effect.max_uses_of_each_emoji,
+                            effect.max_consecutive_segments_with_emoji,
+                        )
+                    )
                 case "emoji_in_word":
-                    self._builder.add_effect(EmojiInWordEffect(effect.emojis, self._build_tag_condition(effect.tag_condition), effect.avoid_use_same_emoji_in_a_row))
+                    self._builder.add_effect(
+                        EmojiInWordEffect(
+                            effect.emojis,
+                            self._build_tag_condition(effect.tag_condition),
+                            effect.avoid_use_same_emoji_in_a_row,
+                        )
+                    )
                 case "remove_punctuation_marks":
-                    self._builder.add_effect(RemovePunctuationMarksEffect(effect.punctuation_marks, effect.exception_marks))
+                    self._builder.add_effect(
+                        RemovePunctuationMarksEffect(
+                            effect.punctuation_marks, effect.exception_marks
+                        )
+                    )
                 case "typewriting":
-                    self._builder.add_effect(TypewritingEffect(self._build_tag_condition(effect.tag_condition)))
+                    self._builder.add_effect(
+                        TypewritingEffect(
+                            self._build_tag_condition(effect.tag_condition)
+                        )
+                    )
                 case "animate_segment_emojis":
                     self._builder.add_effect(AnimateSegmentEmojisEffect())
 
@@ -117,7 +157,7 @@ class JsonConfigLoader:
                             self._build_tag_condition(effect.tag_condition),
                             effect.offset,
                             effect.volume,
-                            effect.interpret_consecutive_words_as_one
+                            effect.interpret_consecutive_words_as_one,
                         )
                     )
                 case "custom":
@@ -129,7 +169,7 @@ class JsonConfigLoader:
                             self._build_tag_condition(effect.tag_condition),
                             effect.offset,
                             effect.volume,
-                            effect.interpret_consecutive_words_as_one
+                            effect.interpret_consecutive_words_as_one,
                         )
                     )
 
@@ -137,13 +177,15 @@ class JsonConfigLoader:
         for animation_config in self._config.animations:
             tag_condition = self._build_tag_condition(animation_config.tag_condition)
             animation = self._build_animation(animation_config)
-            self._builder.add_animation(animation, animation_config.when, animation_config.what, tag_condition)
+            self._builder.add_animation(
+                animation, animation_config.when, animation_config.what, tag_condition
+            )
 
     def _build_tag_condition(self, tag_condition: str) -> TagCondition:
         if tag_condition:
             return TagConditionFactory.parse(tag_condition)
         return TagConditionFactory.TRUE()
-    
+
     def _build_animation(self, animation: AnimationConfig) -> Animation:
         match animation.type:
             case "fade_in":
@@ -163,14 +205,16 @@ class JsonConfigLoader:
             case "slide_in":
                 return SlideIn(animation.direction, animation.duration, animation.delay)
             case "slide_out":
-                return SlideOut(animation.direction, animation.duration, animation.delay)
+                return SlideOut(
+                    animation.direction, animation.duration, animation.delay
+                )
             case "zoom_in_primitive":
                 return ZoomInPrimitive(
                     animation.duration,
                     animation.delay,
                     self._build_transformer(animation.transformer),
                     animation.init_scale,
-                    animation.overshoot
+                    animation.overshoot,
                 )
             case "pop_in_primitive":
                 return PopInPrimitive(
@@ -180,7 +224,7 @@ class JsonConfigLoader:
                     animation.init_scale,
                     animation.min_scale,
                     animation.min_scale_at,
-                    animation.overshoot
+                    animation.overshoot,
                 )
             case "slide_in_primitive":
                 return SlideInPrimitive(
@@ -189,17 +233,16 @@ class JsonConfigLoader:
                     self._build_transformer(animation.transformer),
                     animation.direction,
                     animation.distance,
-                    animation.overshoot
+                    animation.overshoot,
                 )
             case "fade_in_primitive":
                 return FadeInPrimitive(
                     animation.duration,
                     animation.delay,
-                    self._build_transformer(animation.transformer)
+                    self._build_transformer(animation.transformer),
                 )
             case _:
                 raise ValueError(f"Invalid animation type: {animation.type}")
-            
 
     def _build_transformer(self, transformer: str) -> Transformer:
         match transformer:
@@ -224,8 +267,15 @@ class JsonConfigLoader:
             elif rule.type == "regex":
                 tagger.add_regex_rule(Tag(rule.tag), rule.regex)
             elif rule.type == "wordlist":
-                wordlist = open(os.path.join(self._base_path, rule.filename), "r", encoding="utf-8").read().split()
+                wordlist = (
+                    open(
+                        os.path.join(self._base_path, rule.filename),
+                        "r",
+                        encoding="utf-8",
+                    )
+                    .read()
+                    .split()
+                )
                 tagger.add_wordlist_rule(Tag(rule.tag), wordlist)
 
         self._builder.with_semantic_tagger(tagger)
-
