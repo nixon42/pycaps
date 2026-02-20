@@ -23,10 +23,16 @@ class Ollama(Llm):
 
         url = f"{base_url}/api/generate"
 
-        payload = {"model": model, "prompt": message, "stream": False}
+        payload = {
+            "model": model,
+            "prompt": message,
+            "stream": False,
+            "options": {"temperature": 0.5},
+            "keep_alive": "1h",
+        }
 
         try:
-            response = requests.post(url, json=payload)
+            response = requests.post(url, json=payload, timeout=900)
             response.raise_for_status()
             return response.json().get("response", "")
         except requests.exceptions.RequestException as e:
