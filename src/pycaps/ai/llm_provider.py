@@ -2,6 +2,7 @@ from typing import Optional
 from .llm import Llm
 from .gpt import Gpt
 from .openrouter import OpenRouterLlm
+from .ollama import Ollama
 
 
 class LlmProvider:
@@ -12,9 +13,12 @@ class LlmProvider:
         if LlmProvider._llm is None:
             openrouter = OpenRouterLlm()
             gpt = Gpt()
+            ollama = Ollama()
 
             if openrouter.is_enabled():
                 LlmProvider._llm = openrouter
+            elif ollama.is_enabled():
+                LlmProvider._llm = ollama
             else:
                 LlmProvider._llm = gpt
 
