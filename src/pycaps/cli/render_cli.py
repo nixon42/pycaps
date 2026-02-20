@@ -7,6 +7,7 @@ from pycaps.common import VideoQuality
 from pycaps.layout import VerticalAlignmentType, SubtitleLayoutOptions
 from pycaps.template import TemplateLoader, DEFAULT_TEMPLATE_NAME, TemplateFactory
 from pycaps.transcriber import TranscriptFormat
+from pycaps.ai.llm_provider import LlmProvider
 
 render_app = typer.Typer()
 
@@ -140,6 +141,34 @@ def render(
         rich_help_panel="Whisper",
         show_default=False,
     ),
+    llm_provider: Optional[str] = typer.Option(
+        None,
+        "--llm-provider",
+        help="LLM Provider: openrouter|ollama|gpt",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
+    openrouter_key: Optional[str] = typer.Option(
+        None,
+        "--openrouter-key",
+        help="OpenRouter API Key",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
+    ollama_url: Optional[str] = typer.Option(
+        None,
+        "--ollama-url",
+        help="Ollama Base URL",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
+    ollama_model: Optional[str] = typer.Option(
+        None,
+        "--ollama-model",
+        help="Ollama Model",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
     video_quality: Optional[VideoQuality] = typer.Option(
         None,
         "--video-quality",
@@ -200,6 +229,14 @@ def render(
     ),
 ):
     set_logging_level(logging.DEBUG if verbose else logging.INFO)
+
+    # Configure LLM Provider
+    LlmProvider.configure(
+        provider=llm_provider,
+        openrouter_key=openrouter_key,
+        ollama_url=ollama_url,
+        ollama_model=ollama_model,
+    )
     if template_name and config_file:
         typer.echo("Only one of --template or --config can be provided", err=True)
         return None
