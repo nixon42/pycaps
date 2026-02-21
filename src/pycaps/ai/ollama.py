@@ -17,7 +17,7 @@ class Ollama(Llm):
         )
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
 
-    def send_message(self, message: str, model: str = None) -> str:
+    def send_message(self, prompt: str, model: str = None) -> str:
         base_url = self._base_url
         model = model or self._model
 
@@ -25,7 +25,7 @@ class Ollama(Llm):
 
         payload = {
             "model": model,
-            "prompt": message,
+            "prompt": prompt,
             "stream": False,
             "options": {"temperature": 0.5},
             "keep_alive": "1h",

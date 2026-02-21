@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-class Llm(ABC):
 
+class Llm(ABC):
     @abstractmethod
-    def send_message(self, message: str, model: str) -> str:
+    def send_message(self, prompt: str, model: str) -> str:
         pass
 
     @abstractmethod
