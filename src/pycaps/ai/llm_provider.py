@@ -3,6 +3,7 @@ from .llm import Llm
 from .gpt import Gpt
 from .openrouter import OpenRouterLlm
 from .ollama import Ollama
+from .llama_cpp import LlamaCpp
 
 
 class LlmProvider:
@@ -14,11 +15,15 @@ class LlmProvider:
         openrouter_key: str = None,
         ollama_url: str = None,
         ollama_model: str = None,
+        llama_cpp_url: str = None,
+        llama_cpp_model: str = None,
     ):
         if provider == "openrouter":
             LlmProvider._llm = OpenRouterLlm(api_key=openrouter_key)
         elif provider == "ollama":
             LlmProvider._llm = Ollama(base_url=ollama_url, model=ollama_model)
+        elif provider == "llama_cpp":
+            LlmProvider._llm = LlamaCpp(url=llama_cpp_url, model=llama_cpp_model)
         elif provider == "gpt":
             LlmProvider._llm = Gpt()
         else:

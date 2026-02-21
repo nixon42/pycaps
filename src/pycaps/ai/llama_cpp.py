@@ -1,0 +1,48 @@
+from pycaps.ai.llm import Llm
+import os
+import requests
+from pycaps.logger import logger
+
+
+class LlamaCpp(Llm):
+    URL_ENV_VAR = "PYCAPS_LLAMA_CPP_URL"
+    MODEL_ENV_VAR = "PYCAPS_LLAMA_CPP_MODEL"
+
+    DEFAULT_URL = "http://localhost:8080/v1/chat/completions"
+    DEFAULT_MODEL = "local_model"
+
+    def __init__(self, url: str = None, model: str = None):
+        self._url = url or os.getenv(self.URL_ENV_VAR, self.DEFAULT_URL)
+        self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
+
+    def send_message(self, prompt: str, model: str = None) -> str:
+        url = self._url
+        target_model = model or self._model
+
+        payload = {
+            "model": target_model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.3,
+        }
+
+        try:
+            logger().info(
+                f"Sending request to Llama.cpp at {url} (model: {target_model})"
+            )
+            response = requests.post(url, json=payload, timeout=900)
+            response.raise_for_status()
+
+            data = response.json()
+            # Handle OpenAI-compatible response format
+            if "choices" in data and len(data["choices"]) > 0:
+                return data["choices"][0].get("message", {}).get("content", "").strip()
+            # Fallback for llama.cpp specific /completion endpoint if it was somehow used
+            return data.get("content", "").strip()
+
+        except requests.exceptions.RequestException as e:
+            logger().error(f"Error communicating with Llama.cpp: {e}")
+            raise RuntimeError(f"Error communicating with Llama.cpp: {e}")
+
+    def is_enabled(self) -> bool:
+        # Enabled if URL is explicitly set or default is reachable (simplified)
+        return bool(self._url)

@@ -144,7 +144,7 @@ def render(
     llm_provider: Optional[str] = typer.Option(
         None,
         "--llm-provider",
-        help="LLM Provider: openrouter|ollama|gpt",
+        help="LLM Provider: openrouter|ollama|llama_cpp|gpt",
         rich_help_panel="LLM options",
         show_default=False,
     ),
@@ -166,6 +166,20 @@ def render(
         None,
         "--ollama-model",
         help="Ollama Model",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
+    llama_cpp_url: Optional[str] = typer.Option(
+        None,
+        "--llama-cpp-url",
+        help="Llama.cpp URL",
+        rich_help_panel="LLM options",
+        show_default=False,
+    ),
+    llama_cpp_model: Optional[str] = typer.Option(
+        None,
+        "--llama-cpp-model",
+        help="Llama.cpp Model",
         rich_help_panel="LLM options",
         show_default=False,
     ),
@@ -236,6 +250,8 @@ def render(
         openrouter_key=openrouter_key,
         ollama_url=ollama_url,
         ollama_model=ollama_model,
+        llama_cpp_url=llama_cpp_url,
+        llama_cpp_model=llama_cpp_model,
     )
     if template_name and config_file:
         typer.echo("Only one of --template or --config can be provided", err=True)
