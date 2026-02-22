@@ -183,6 +183,20 @@ def render(
         rich_help_panel="LLM options",
         show_default=False,
     ),
+    llama_cpp_temp: Optional[float] = typer.Option(
+        0.3,
+        "--llama-cpp-temp",
+        help="Llama.cpp Temperature",
+        rich_help_panel="LLM options",
+        show_default=True,
+    ),
+    llama_cpp_think: bool = typer.Option(
+        False,
+        "--llama-cpp-think",
+        help="Llama.cpp Thinking mode",
+        rich_help_panel="LLM options",
+        show_default=True,
+    ),
     video_quality: Optional[VideoQuality] = typer.Option(
         None,
         "--video-quality",
@@ -252,6 +266,8 @@ def render(
         ollama_model=ollama_model,
         llama_cpp_url=llama_cpp_url,
         llama_cpp_model=llama_cpp_model,
+        llama_cpp_temp=llama_cpp_temp,
+        llama_cpp_think=llama_cpp_think,
     )
     if template_name and config_file:
         typer.echo("Only one of --template or --config can be provided", err=True)
