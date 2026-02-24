@@ -18,6 +18,8 @@ class LlamaCpp(Llm):
         temperature: float = 0.5,
         think: bool = False,
     ):
+        self._url_explicit = url is not None
+        self._model_explicit = model is not None
         self._url = url or os.getenv(self.URL_ENV_VAR, self.DEFAULT_URL)
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
         self._temperature = temperature
@@ -34,9 +36,9 @@ class LlamaCpp(Llm):
         }
 
         try:
-            logger().info(
-                f"Sending request to Llama.cpp at {url} (model: {target_model}, temp: {self._temperature}, think: {self._think})"
-            )
+            # logger().info(
+            #     f"Sending request to Llama.cpp at {url} (model: {target_model}, temp: {self._temperature}, think: {self._think})"
+            # )
             response = requests.post(url, json=payload, timeout=900)
             response.raise_for_status()
 
@@ -52,4 +54,4 @@ class LlamaCpp(Llm):
             raise RuntimeError(f"Error communicating with Llama.cpp: {e}")
 
     def is_enabled(self) -> bool:
-        return bool(os.getenv(self.URL_ENV_VAR))
+        return self._url_explicit or bool(os.getenv(self.URL_ENV_VAR))

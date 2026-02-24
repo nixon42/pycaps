@@ -17,7 +17,7 @@ class LlmProvider:
         ollama_model: str = None,
         llama_cpp_url: str = None,
         llama_cpp_model: str = None,
-        llama_cpp_temp: float = 0.3,
+        llama_cpp_temp: float = 0.5,
         llama_cpp_think: bool = False,
     ):
         if provider == "openrouter":
@@ -28,8 +28,6 @@ class LlmProvider:
             LlmProvider._llm = LlamaCpp(
                 url=llama_cpp_url,
                 model=llama_cpp_model,
-                temperature=llama_cpp_temp,
-                think=llama_cpp_think,
             )
         elif provider == "gpt":
             LlmProvider._llm = Gpt()

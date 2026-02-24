@@ -3,8 +3,8 @@ from pycaps.common import Document, Segment
 from pycaps.ai import LlmProvider
 from pycaps.utils import ScriptUtils
 
+
 class EmojiInSegmentLlmGetter:
-    
     def __init__(self) -> None:
         self._llm = None
         self._summary = ""
@@ -12,7 +12,7 @@ class EmojiInSegmentLlmGetter:
     def start(self, document: Document) -> None:
         self._llm = LlmProvider.get()
         self._summary = ScriptUtils.get_basic_summary(document.get_text())
-    
+
     def get_emoji(self, segment: Segment) -> Optional[str]:
         text = segment.get_text()
         text_response = self._llm.send_message(
@@ -29,10 +29,17 @@ class EmojiInSegmentLlmGetter:
             3. Respond only with the emoji, no other text.
             4. If the text received doesn't contain any relevant information (e.g. it's too vague, neutral, or generic), respond with "None".
 
+            STRICT OUTPUT MODE:
+            - No Markdown.
+            - No explanations.
+            - No reasoning.
+            - No extra commentary.
+            - No newline.
+
             Subtitle to analyze: "{text}"
             """
         )
         if text_response == "None":
             return None
-        
+
         return text_response
