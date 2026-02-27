@@ -29,7 +29,7 @@ class LlamaCpp(Llm):
 
         self._url = base_url
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
-        self._temperature = 0.5
+        self._temperature = 0.7
         self._think = False
 
     def send_message(self, prompt: str, model: str = None) -> str:
