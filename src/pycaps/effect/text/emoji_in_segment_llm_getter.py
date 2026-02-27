@@ -2,6 +2,7 @@ from typing import Optional
 from pycaps.common import Document, Segment
 from pycaps.ai import LlmProvider
 from pycaps.utils import ScriptUtils
+from pycaps.logger import logger
 
 
 class EmojiInSegmentLlmGetter:
@@ -15,8 +16,7 @@ class EmojiInSegmentLlmGetter:
 
     def get_emoji(self, segment: Segment) -> Optional[str]:
         text = segment.get_text()
-        text_response = self._llm.send_message(
-            prompt=f"""
+        prompt = f"""
             Given the following subtitle text, decide whether it meaningfully conveys an emotion, action, or idea that can be represented with an emoji.
             If it does you will need to respond with a single, appropriate emoji only.
 
@@ -32,12 +32,29 @@ class EmojiInSegmentLlmGetter:
             STRICT OUTPUT MODE:
             - No Markdown.
             - No explanations.
-            - No reasoning.
             - No extra commentary.
-            - No newline.
+            - just emoji or "None"
 
             Subtitle to analyze: "{text}"
             """
+        prompt = f"""
+Task: Decide if the subtitle expresses a clear emotion, action, or idea that can be represented with ONE emoji.
+
+Context:
+Video summary: {self._summary}
+
+Rules:
+- Use the summary for context.
+- If suitable, return exactly ONE relevant emoji.
+- If vague/neutral/generic, return: None
+- Output ONLY the emoji or None.
+- No text, no explanation, no markdown.
+
+Subtitle: "{text}"
+        """
+        text_response = self._llm.send_message(prompt=prompt)
+        logger().info(
+            f"[EmojiInSegmentLlmGetter] Emoji for segment '{text}': {text_response}"
         )
         if text_response == "None":
             return None

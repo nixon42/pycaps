@@ -15,7 +15,7 @@ class LlamaCpp(Llm):
         self,
         url: str = None,
         model: str = None,
-        temperature: float = 0.5,
+        temperature: float = 0.7,
         think: bool = False,
     ):
         self._url_explicit = url is not None
@@ -29,8 +29,8 @@ class LlamaCpp(Llm):
 
         self._url = base_url
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
-        self._temperature = temperature
-        self._think = think
+        self._temperature = 0.5
+        self._think = False
 
     def send_message(self, prompt: str, model: str = None) -> str:
         target_model = model or self._model
@@ -42,9 +42,9 @@ class LlamaCpp(Llm):
         }
 
         try:
-            # logger().info(
-            #     f"Sending request to Llama.cpp at {self._url} (model: {target_model}, temp: {self._temperature}, think: {self._think})"
-            # )
+            logger().info(
+                f"[Llama.cpp] (model: {target_model}, temp: {self._temperature}, think: {self._think})"
+            )
 
             response = requests.post(self._url, json=payload, timeout=900)
             response.raise_for_status()
