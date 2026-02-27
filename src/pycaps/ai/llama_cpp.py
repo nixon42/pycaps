@@ -20,13 +20,19 @@ class LlamaCpp(Llm):
     ):
         self._url_explicit = url is not None
         self._model_explicit = model is not None
-        self._url = url or os.getenv(self.URL_ENV_VAR, self.DEFAULT_URL)
+
+        base_url = url or os.getenv(self.URL_ENV_VAR, self.DEFAULT_URL)
+        if base_url and not base_url.endswith("/v1/chat/completions"):
+            if not base_url.endswith("/"):
+                base_url += "/"
+            base_url += "v1/chat/completions"
+
+        self._url = base_url
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
         self._temperature = temperature
         self._think = think
 
     def send_message(self, prompt: str, model: str = None) -> str:
-        url = self._url
         target_model = model or self._model
 
         payload = {
@@ -37,9 +43,10 @@ class LlamaCpp(Llm):
 
         try:
             # logger().info(
-            #     f"Sending request to Llama.cpp at {url} (model: {target_model}, temp: {self._temperature}, think: {self._think})"
+            #     f"Sending request to Llama.cpp at {self._url} (model: {target_model}, temp: {self._temperature}, think: {self._think})"
             # )
-            response = requests.post(url, json=payload, timeout=900)
+
+            response = requests.post(self._url, json=payload, timeout=900)
             response.raise_for_status()
 
             data = response.json()
@@ -50,8 +57,10 @@ class LlamaCpp(Llm):
             return data.get("content", "").strip()
 
         except requests.exceptions.RequestException as e:
-            logger().error(f"Error communicating with Llama.cpp: {e}")
-            raise RuntimeError(f"Error communicating with Llama.cpp: {e}")
+            logger().error(f"Error communicating with Llama.cpp at {self._url}: {e}")
+            raise RuntimeError(
+                f"Error communicating with Llama.cpp at {self._url}: {e}"
+            )
 
     def is_enabled(self) -> bool:
         return self._url_explicit or bool(os.getenv(self.URL_ENV_VAR))

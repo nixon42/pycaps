@@ -12,16 +12,21 @@ class Ollama(Llm):
     DEFAULT_MODEL = "llama3"
 
     def __init__(self, base_url: str = None, model: str = None):
-        self._base_url = base_url or os.getenv(
-            self.BASE_URL_ENV_VAR, self.DEFAULT_BASE_URL
-        )
+        url = base_url or os.getenv(self.BASE_URL_ENV_VAR, self.DEFAULT_BASE_URL)
+        # Sanitize base_url: remove trailing slash and api/generate if present
+        if url:
+            url = url.rstrip("/")
+            if url.endswith("/api/generate"):
+                url = url[: -len("/api/generate")]
+            elif url.endswith("/api/chat"):
+                url = url[: -len("/api/chat")]
+        self._base_url = url
         self._model = model or os.getenv(self.MODEL_ENV_VAR, self.DEFAULT_MODEL)
 
     def send_message(self, prompt: str, model: str = None) -> str:
-        base_url = self._base_url
         model = model or self._model
 
-        url = f"{base_url}/api/generate"
+        url = f"{self._base_url}/api/generate"
 
         payload = {
             "model": model,

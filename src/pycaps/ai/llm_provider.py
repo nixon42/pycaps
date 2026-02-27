@@ -28,6 +28,8 @@ class LlmProvider:
             LlmProvider._llm = LlamaCpp(
                 url=llama_cpp_url,
                 model=llama_cpp_model,
+                temperature=llama_cpp_temp,
+                think=llama_cpp_think,
             )
         elif provider == "gpt":
             LlmProvider._llm = Gpt()
@@ -35,7 +37,12 @@ class LlmProvider:
             # Auto-detection logic if no provider specified
             openrouter = OpenRouterLlm(api_key=openrouter_key)
             ollama = Ollama(base_url=ollama_url, model=ollama_model)
-            llama_cpp = LlamaCpp(url=llama_cpp_url, model=llama_cpp_model)
+            llama_cpp = LlamaCpp(
+                url=llama_cpp_url,
+                model=llama_cpp_model,
+                temperature=llama_cpp_temp,
+                think=llama_cpp_think,
+            )
             gpt = Gpt()
 
             if openrouter.is_enabled():
