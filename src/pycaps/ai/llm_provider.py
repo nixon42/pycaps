@@ -20,11 +20,11 @@ class LlmProvider:
         llama_cpp_temp: float = 0.5,
         llama_cpp_think: bool = False,
     ):
-        if provider == "openrouter":
+        if provider == "OpenRouter":
             LlmProvider._llm = OpenRouterLlm(api_key=openrouter_key)
-        elif provider == "ollama":
+        elif provider == "Ollama":
             LlmProvider._llm = Ollama(base_url=ollama_url, model=ollama_model)
-        elif provider == "llama_cpp":
+        elif provider == "LlamaCpp":
             LlmProvider._llm = LlamaCpp(
                 url=llama_cpp_url,
                 model=llama_cpp_model,
