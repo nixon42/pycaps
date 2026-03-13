@@ -24,7 +24,7 @@ class LlmProvider:
             LlmProvider._llm = OpenRouterLlm(api_key=openrouter_key)
         elif provider == "Ollama":
             LlmProvider._llm = Ollama(base_url=ollama_url, model=ollama_model)
-        elif provider == "LlamaCpp":
+        elif provider == "LlamaCPP":
             LlmProvider._llm = LlamaCpp(
                 url=llama_cpp_url,
                 model=llama_cpp_model,
