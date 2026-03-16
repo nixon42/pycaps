@@ -144,7 +144,7 @@ def render(
     llm_provider: Optional[str] = typer.Option(
         None,
         "--llm-provider",
-        help="LLM Provider: openrouter|ollama|llama_cpp|gpt",
+        help="LLM Provider: OpenRouter|Ollama|LlamaCPP|gpt",
         rich_help_panel="LLM options",
         show_default=False,
     ),
