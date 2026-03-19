@@ -63,7 +63,7 @@ Tagged version:"""
         Ensures the response follows the expected format and contains valid tags.
         Returns the original text if the tagged text is not valid, otherwise returns the tagged text received.
         """
-        tagged_text_without_tags = tagged_text.strip()
+        tagged_text_without_tags = (tagged_text or "").strip()
         for tag in rules.keys():
             pattern = f'<{tag.name}>(.*?)</{tag.name}>'
             tagged_text_without_tags = re.sub(pattern, r'\1', tagged_text_without_tags)
@@ -73,4 +73,4 @@ Tagged version:"""
             logger().warning("Using the original text instead.")
             return original_text
         
-        return tagged_text.strip()
+        return (tagged_text or "").strip()

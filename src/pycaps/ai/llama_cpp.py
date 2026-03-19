@@ -52,9 +52,9 @@ class LlamaCpp(Llm):
             data = response.json()
             # Handle OpenAI-compatible response format
             if "choices" in data and len(data["choices"]) > 0:
-                return data["choices"][0].get("message", {}).get("content", "").strip()
+                return (data["choices"][0].get("message", {}).get("content") or "").strip()
             # Fallback for llama.cpp specific /completion endpoint if it was somehow used
-            return data.get("content", "").strip()
+            return (data.get("content") or "").strip()
 
         except requests.exceptions.RequestException as e:
             logger().error(f"Error communicating with Llama.cpp at {self._url}: {e}")

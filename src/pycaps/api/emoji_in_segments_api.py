@@ -18,7 +18,7 @@ class EmojiInSegmentsApi:
         payload["segments"] = segment_texts
         try:
             response = send(self._FEATURE_NAME, payload)
-            if not response or type(response) != list:
+            if not response or not isinstance(response, list):
                 logger().error(f"Invalid response received API, ignoring emojies feature. Response: {response}")
                 self._cached_response = []
             else:
@@ -34,7 +34,7 @@ class EmojiInSegmentsApi:
 
         segment_text = segment.get_text().strip().lower()
         for processed_segment in self._cached_response:
-            processed_text = processed_segment.get("text", "").strip().lower()
+            processed_text = (processed_segment.get("text") or "").strip().lower()
             if segment_text == processed_text:
                 return processed_segment.get("emoji", None)
             
